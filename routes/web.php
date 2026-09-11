@@ -39,7 +39,6 @@ Route::middleware(['auth', 'verified', 'require-household'])->group(function () 
     Route::controller(PurchaseController::class)->group(function () {
         Route::prefix('purchases')->name('purchases.')->group(function () {
             Route::get('', 'indexPage')->name('index');
-            Route::get('create', 'createPage')->name('create');
             Route::get('edit/{purchaseId}', 'editPage')->name('edit');
 
             Route::post('store', 'store')->name('store');

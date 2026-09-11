@@ -9,14 +9,6 @@
                     Acompanhe suas compras iniciadas
                 </flux:subheading>
             </div>
-            <flux:button
-                variant="primary"
-                icon="plus"
-                :href="route('purchases.create')"
-                wire:navigate
-            >
-                Iniciar compra
-            </flux:button>
         </div>
 
         <flux:separator variant="subtle"/>

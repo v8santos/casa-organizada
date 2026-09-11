@@ -27,7 +27,7 @@ class ShoppingListController extends Controller
 
     public function editPage(Request $request, int $listId): View
     {
-        $list = $this->service->getShoppingListById($listId, $request->user()->id);
+        $list = $this->service->getShoppingListById($listId, $request->household()->id);
 
         abort_if($list === null, 404);
 

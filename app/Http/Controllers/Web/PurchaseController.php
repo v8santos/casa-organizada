@@ -25,13 +25,6 @@ class PurchaseController extends Controller
         return view('purchase.index', compact('purchases'));
     }
 
-    public function createPage(Request $request)
-    {
-        $shoppingLists = $this->shoppingListService->getAllShoppingLists($request->household()->id);
-
-        return view('purchase.create', compact('shoppingLists'));
-    }
-
     public function editPage(Request $request, int $purchaseId)
     {
         $purchase = $this->service->getPurchaseById($request->household()->id, $purchaseId);
