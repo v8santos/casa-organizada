@@ -4,7 +4,6 @@
             fn ($item) => round((float) $item->price * $item->quantity, 2)
         );
         $totalItems = $purchase->items->sum('quantity');
-        $shoppingListCount = $purchase->shoppingLists->count();
     @endphp
 
     <div class="flex h-full min-w-0 w-full max-w-full flex-1 flex-col gap-6" x-data="{ search: '' }">
@@ -49,7 +48,7 @@
                 <div class="flex items-center justify-between gap-6">
                     <div>
                         <flux:text class="text-sm">Listas de compras</flux:text>
-                        <p class="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">{{ $shoppingListCount }}</p>
+                        <p class="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">-999</p>
                     </div>
                     <div class="grid size-10 place-items-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
                         <flux:icon.calendar-days class="size-5" />
@@ -58,7 +57,7 @@
             </div>
         </div>
 
-        @if ($purchase->shoppingLists->isNotEmpty())
+        @if (! empty($purchase->shoppingList))
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <flux:heading size="lg">Minhas listas</flux:heading>
@@ -71,90 +70,14 @@
             </div>
 
             <div class="w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-                <div class="w-full min-w-0 max-w-full">
-                    <table class="block w-full max-w-full text-left text-sm xl:table">
-                        <thead class="hidden border-b border-zinc-200 bg-zinc-50 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-400 xl:table-header-group">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">Lista</th>
-                                <th scope="col" class="px-6 py-3">Itens</th>
-                                <th scope="col" class="px-6 py-3">Última atualização</th>
-                                <th scope="col" class="px-6 py-3 text-right"><span class="sr-only">Ações</span></th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="block divide-y divide-zinc-200 dark:divide-zinc-700 xl:table-row-group xl:divide-y xl:divide-zinc-100 xl:dark:divide-zinc-800">
-                            @foreach ($purchase->shoppingLists as $list)
-                                @php
-                                    $itemsCount = $list->items->count();
-                                @endphp
-                                <tr
-                                    x-show="!search || @js(str($list->name ?: 'Lista sem título')->lower()).includes(search.toLowerCase())"
-                                    x-transition.opacity.duration.150ms
-                                    class="grid w-full min-w-0 grid-cols-2 gap-x-4 gap-y-3 p-4 transition hover:bg-zinc-50 dark:hover:bg-zinc-800/40 xl:table-row xl:p-0"
-                                >
-                                    <td class="col-span-2 block min-w-0 pb-1 xl:table-cell xl:px-6 xl:py-4">
-                                        <div class="truncate font-medium text-zinc-900 dark:text-white">{{ $list->name ?: 'Lista sem título' }}</div>
-                                        @if ($list->items->isNotEmpty())
-                                            <div class="mt-1 max-w-xs truncate text-xs text-zinc-500 dark:text-zinc-400">
-                                                {{ $list->items->take(3)->pluck('name')->join(', ') }}
-                                                @if ($itemsCount > 3)
-                                                    e mais {{ $itemsCount - 3 }}
-                                                @endif
-                                            </div>
-                                        @else
-                                            <div class="mt-1 text-xs text-zinc-400">Nenhum item adicionado</div>
-                                        @endif
-                                    </td>
-
-                                    <td class="block min-w-0 xl:table-cell xl:px-6 xl:py-4">
-                                        <span class="mb-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-400 xl:hidden">Itens</span>
-                                        <flux:badge size="sm" variant="pill">
-                                            {{ $itemsCount }} {{ $itemsCount === 1 ? 'item' : 'itens' }}
-                                        </flux:badge>
-                                    </td>
-
-                                    <td class="block min-w-0 text-zinc-600 dark:text-zinc-300 xl:table-cell xl:whitespace-nowrap xl:px-6 xl:py-4">
-                                        <span class="mb-1 block text-[10px] font-medium uppercase tracking-wide text-zinc-400 xl:hidden">Atualização</span>
-                                        {{ $list->updated_at->format('d/m/Y H:i') }}
-                                    </td>
-
-                                    <td class="block min-w-0 self-end xl:table-cell xl:px-6 xl:py-4">
-                                        <div class="flex items-center gap-1 xl:flex-nowrap">
-                                            <flux:modal.trigger name="sync-shopping-list-items-{{ $list->id }}">
-                                                <flux:button variant="ghost" size="sm" icon="eye" aria-label="Visualizar {{ $list->name }}" />
-                                            </flux:modal.trigger>
-                                            <flux:button
-                                                :href="route('shopping-lists.edit', $list)"
-                                                variant="ghost"
-                                                size="sm"
-                                                icon="pencil-square"
-                                                wire:navigate
-                                                aria-label="Editar {{ $list->name ?: 'lista sem título' }}"
-                                            >
-                                                Editar
-                                            </flux:button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            @foreach ($purchase->shoppingLists as $list)
-                <flux:modal
-                    name="sync-shopping-list-items-{{ $list->id }}"
-                    focusable
-                    class="w-[calc(100vw-2rem)] max-w-lg"
-                >
-                    <form method="POST" action="{{ route('purchases.shopping-lists.items', ['purchase' => $purchase->id, 'shoppingList' => $list->id]) }}" class="min-w-0 space-y-6">
+                <div class="w-full min-w-0 max-w-full p-6">
+                    <form method="POST" action="{{ route('purchases.shopping-list.items', ['purchase' => $purchase->id, 'shoppingList' => $purchase->shoppingList->id]) }}" class="min-w-0 space-y-6">
                         @csrf
                         @method('PUT')
-                        <input type="hidden" name="shopping_list_id" value="{{ $list->id }}">
+                        <input type="hidden" name="shopping_list_id" value="{{ $purchase->shoppingList->id }}">
 
                         <flux:checkbox.group name="items">
-                            @foreach ($list->items as $item)
+                            @foreach ($purchase->shoppingList->items as $item)
                                 <flux:checkbox :label="$item->name" :value="$item->id" :checked="$purchase->items->contains('shopping_list_item_id', $item->id)" />
                             @endforeach
                         </flux:checkbox.group>
@@ -166,8 +89,8 @@
                             <flux:button type="submit" variant="primary">Salvar alterações</flux:button>
                         </div>
                     </form>
-                </flux:modal>
-            @endforeach
+                </div>
+            </div>
         @else
             <div class="flex min-h-96 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 px-6 text-center dark:border-zinc-700 dark:bg-zinc-900/30">
                 <div class="mb-4 grid size-12 place-items-center rounded-lg border border-zinc-200 bg-white text-zinc-500 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">

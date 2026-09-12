@@ -26,7 +26,7 @@ class PurchaseService
     public function getPurchaseById(int $householdId, $purchaseId): Purchase
     {
         return Purchase::query()
-            ->with('items', 'shoppingLists', 'shoppingLists.items')
+            ->with('items', 'shoppingList', 'shoppingList.items')
             ->whereHas('shoppingList', function ($query) use ($householdId) {
                 $query->where('household_id', $householdId);
             })
@@ -75,7 +75,7 @@ class PurchaseService
 
     public function syncItems(Purchase $purchase, User $user, ShoppingList $shoppingList, ?array $itemIds): void
     {
-        if ($purchase->owner_id !== $user->id) {
+        if (! $user->households()->find($shoppingList->household_id)) {
             throw new Exception('Usuário não autorizado', 403);
         }
 

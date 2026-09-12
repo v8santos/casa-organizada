@@ -69,10 +69,7 @@
                     <span x-show="copied" x-cloak>Copiada!</span>
                 </flux:button>
 
-
-                <form method="POST" action="{{ route('purchases.store', ['shopping_list_id' => $list->id, 'name' => $list->name]) }}">
-                    @csrf
-
+                <flux:modal.trigger name="start-purchase">
                     <flux:button
                         type="submit"
                         variant="filled"
@@ -82,7 +79,36 @@
                     >
                         Iniciar compra
                     </flux:button>
-                </form>
+                </flux:modal.trigger>
+
+                <flux:modal name="start-purchase">
+                    <form method="POST" action="{{ route('purchases.store', ['shopping_list_id' => $list->id, 'name' => $list->name]) }}">
+                        @csrf
+
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading size="lg">Deseja continuar com a compra?</flux:heading>
+                                <flux:subheading class="mt-2">Adicione um nome para facilitar na identificação da compra</flux:subheading>
+                            </div>
+
+                            <flux:input label="Título da compra" name=""/>
+
+                            <div class="flex">
+                                <flux:spacer />
+
+                                <flux:button
+                                    type="submit"
+                                    variant="filled"
+                                    size="sm"
+                                    icon="shopping-cart"
+                                    :disabled="$list->items->isEmpty()"
+                                    >
+                                    Continuar
+                                </flux:button>
+                            </div>
+                        </div>
+                    </form>
+                </flux:modal>
             </div>
         </div>
 

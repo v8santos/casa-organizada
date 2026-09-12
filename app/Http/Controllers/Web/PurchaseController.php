@@ -36,13 +36,13 @@ class PurchaseController extends Controller
     {
         $request->validate([
             'name' => ['nullable', 'string', 'min:3', 'max:255'],
-            'shopping_list_id' => ['sometimes', 'integer'],
+            'shopping_list_id' => ['required', 'integer'],
         ]);
 
-        $purchase = $this->service->createPurchase(
+        $this->service->createPurchase(
             $request->name,
-            $request->user(),
-            $request->shopping_list_id ?? null,
+            $request->user()->id,
+            $request->shopping_list_id,
         );
 
         return redirect()
