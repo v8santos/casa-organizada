@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ItemStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->decimal("estimated_price", 8, 2)->nullable();
             $table->decimal("quantity", 6, 3);
             $table->string("unit");
+            $table->tinyInteger("status")->default(ItemStatusEnum::PENDING->value);
             /**
              * aqui queremos que os itens sejam removidos
              * quando a lista for apagada.

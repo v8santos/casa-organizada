@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\ItemStatusEnum;
+use App\Enums\ItemUnitEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,6 +22,8 @@ class ShoppingListItem extends Model
         return [
             'estimated_price' => 'decimal:2',
             'quantity' => 'double',
+            'unit' => ItemUnitEnum::class,
+            'status' => ItemStatusEnum::class,
         ];
     }
 

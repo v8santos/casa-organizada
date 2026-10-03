@@ -1,8 +1,4 @@
 <x-layouts::app :title="__('Listas de compras')">
-    @php
-        $totalItems = $lists->sum('items_count');
-    @endphp
-
     <div class="flex h-full w-full flex-1 flex-col gap-6" x-data="{ search: '' }">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -25,33 +21,6 @@
         @endif
 
         @if ($lists->isNotEmpty())
-            <div class="grid gap-5 sm:grid-cols-2">
-                <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center justify-between gap-6">
-                        <div>
-                            <flux:text class="text-sm">Total de listas</flux:text>
-                            <p class="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">{{ $lists->count() }}</p>
-                        </div>
-                        <div class="grid size-10 place-items-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                            <flux:icon.clipboard-document-list class="size-5" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
-                    <div class="flex items-center justify-between gap-6">
-                        <div>
-                            <flux:text class="text-sm">Itens planejados</flux:text>
-                            <p class="mt-2 text-2xl font-semibold text-zinc-900 dark:text-white">{{ $totalItems }}</p>
-                        </div>
-                        <div class="grid size-10 place-items-center rounded-lg bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                            <flux:icon.shopping-bag class="size-5" />
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <flux:heading size="lg">Minhas listas</flux:heading>

@@ -22,7 +22,6 @@ final class ShoppingListService
     {
         return ShoppingList::query()
             ->where('household_id', $householdId)
-            ->with('items')
             ->find($id);
     }
 
@@ -77,7 +76,7 @@ final class ShoppingListService
     public function exportAsPlainText(ShoppingList $shoppingList): string
     {
         $lines = $shoppingList->items->map(function (ShoppingListItem $item): string {
-            $quantity = $item->quantity.' '.$item->unit;
+            $quantity = $item->quantity.' '.$item->unit->value;
             $price = $item->estimated_price !== null
                 ? ' · R$ '.number_format((float) $item->estimated_price * $item->quantity, 2, ',', '.')
                 : '';

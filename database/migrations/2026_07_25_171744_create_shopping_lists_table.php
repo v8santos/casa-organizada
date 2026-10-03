@@ -29,6 +29,7 @@ return new class extends Migration
                 ->constrained()
                 ->nullOnDelete();
 
+            $table->timestamp('purchased_at')->nullable();
             $table->timestamps();
         });
     }

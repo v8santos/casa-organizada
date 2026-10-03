@@ -43,7 +43,7 @@ class ShoppingListController extends Controller
         ]);
 
         $data['owner_id'] = $request->user()->id;
-        $data['household_id'] = $request->user()->households->first()->id;
+        $data['household_id'] = $request->household()->id;
         $list = $this->service->createShoppingList($data);
 
         return redirect()
@@ -70,7 +70,7 @@ class ShoppingListController extends Controller
 
     public function storeItem(Request $request, int $listId): RedirectResponse
     {
-        $list = $this->service->getShoppingListById($listId, $request->user()->id);
+        $list = $this->service->getShoppingListById($listId, $request->household()->id);
         abort_if($list === null, 404);
 
         $request->merge([

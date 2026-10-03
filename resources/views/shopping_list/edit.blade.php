@@ -68,47 +68,6 @@
                     <span x-show="!copied">Copiar lista</span>
                     <span x-show="copied" x-cloak>Copiada!</span>
                 </flux:button>
-
-                <flux:modal.trigger name="start-purchase">
-                    <flux:button
-                        type="submit"
-                        variant="filled"
-                        size="sm"
-                        icon="shopping-cart"
-                        :disabled="$list->items->isEmpty()"
-                    >
-                        Iniciar compra
-                    </flux:button>
-                </flux:modal.trigger>
-
-                <flux:modal name="start-purchase">
-                    <form method="POST" action="{{ route('purchases.store', ['shopping_list_id' => $list->id, 'name' => $list->name]) }}">
-                        @csrf
-
-                        <div class="space-y-6">
-                            <div>
-                                <flux:heading size="lg">Deseja continuar com a compra?</flux:heading>
-                                <flux:subheading class="mt-2">Adicione um nome para facilitar na identificação da compra</flux:subheading>
-                            </div>
-
-                            <flux:input label="Título da compra" name=""/>
-
-                            <div class="flex">
-                                <flux:spacer />
-
-                                <flux:button
-                                    type="submit"
-                                    variant="filled"
-                                    size="sm"
-                                    icon="shopping-cart"
-                                    :disabled="$list->items->isEmpty()"
-                                    >
-                                    Continuar
-                                </flux:button>
-                            </div>
-                        </div>
-                    </form>
-                </flux:modal>
             </div>
         </div>
 
@@ -129,7 +88,7 @@
                         <flux:text class="mt-1 text-sm">Adicione os produtos que pretende comprar.</flux:text>
                     </div>
 
-                    <form method="POST" action="{{ route('shopping-lists.items.store', $list) }}" class="p-6">
+                    <form method="POST" action="{{ route('shopping-lists.items.store', ['listId' => $list]) }}" class="p-6">
                         @csrf
 
                         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12">
@@ -197,19 +156,19 @@
                         </div>
                     @else
                         <div class="border-t border-zinc-200 dark:border-zinc-700">
-                            <div class="hidden grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_5.5rem] gap-4 border-b border-zinc-100 px-6 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 md:grid">
+                            <div class="hidden grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_6rem_12rem] gap-4 border-b border-zinc-100 px-6 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 md:grid">
                                 <span>Produto</span>
                                 <span>Quantidade</span>
                                 <span>Preço unitário</span>
                                 <span class="text-right">Subtotal</span>
+                                <span class="text-right">Quantidade comprada</span>
                                 <span class="sr-only">Ações</span>
                             </div>
 
                             <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 @foreach ($list->items as $item)
-                                    <li class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 px-6 py-4 text-sm md:grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_5.5rem] md:items-center md:gap-4">
+                                    <li class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 px-6 py-4 text-sm md:grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_6rem_12rem] md:items-center md:gap-4">
                                         <div class="flex min-w-0 items-center gap-3">
-                                            <span class="size-4 shrink-0 rounded border border-zinc-300 dark:border-zinc-600"></span>
                                             <span class="truncate font-medium text-zinc-900 dark:text-white">{{ $item->name }}</span>
                                         </div>
                                         <span class="col-start-1 pl-7 text-zinc-600 dark:text-zinc-300 md:col-start-auto md:pl-0">{{ $item->quantity }} {{ $item->unit }}</span>
@@ -221,6 +180,12 @@
                                         </span>
 
                                         <div class="col-start-2 row-start-1 row-end-5 flex items-start justify-end gap-1 md:col-start-auto md:row-auto md:items-center">
+                                            <flux:modal.trigger name="buy-item-{{ $item->id }}">
+                                                <flux:button variant="primary" size="sm" icon="shopping-cart" aria-label="Comprar {{ $item->name }}">
+                                                    Comprar
+                                                </flux:button>
+                                            </flux:modal.trigger>
+
                                             <flux:modal.trigger name="edit-item-{{ $item->id }}">
                                                 <flux:button variant="ghost" size="sm" icon="pencil-square" aria-label="Editar {{ $item->name }}" />
                                             </flux:modal.trigger>
@@ -230,6 +195,46 @@
                                             </flux:modal.trigger>
                                         </div>
                                     </li>
+
+                                    <flux:modal name="buy-item-{{ $item->id }}" focusable class="max-w-md">
+                                        <form method="POST" action="{{ route('shopping-lists.items.update', ['listId' => $list->id, 'itemId' => $item->id]) }}" class="space-y-6">
+                                            @csrf
+
+                                            <div class="flex items-start gap-4">
+                                                <div class="grid size-10 shrink-0 place-items-center rounded-full bg-red-100 text-green-600 dark:bg-green-950 dark:text-green-400">
+                                                    <flux:icon.shopping-cart class="size-5" />
+                                                </div>
+                                                <div>
+                                                    <flux:heading size="lg">Comprar item?</flux:heading>
+                                                    <flux:subheading class="mt-2">
+                                                        O item <strong class="font-medium text-zinc-900 dark:text-white">{{ $item->name }}</strong> será adicionado às compras
+                                                    </flux:subheading>
+                                                </div>
+                                            </div>
+
+                                            <flux:input
+                                                name="buy_item_price"
+                                                label="Preço"
+                                                :value="$item->estimated_price"
+                                                required
+                                                autofocus
+                                            />
+
+                                            <flux:input
+                                                name="buy_item_quantity"
+                                                label="Quantidade ({{  $item->unit->label() }})"
+                                                :value="$item->quantity"
+                                                required
+                                            />
+
+                                            <div class="flex justify-end gap-3 border-t border-zinc-100 pt-5 dark:border-zinc-800">
+                                                <flux:modal.close>
+                                                    <flux:button variant="ghost">Cancelar</flux:button>
+                                                </flux:modal.close>
+                                                <flux:button type="submit" variant="primary">Adicionar item</flux:button>
+                                            </div>
+                                        </form>
+                                    </flux:modal>
 
                                     <flux:modal
                                         name="edit-item-{{ $item->id }}"
@@ -269,7 +274,7 @@
                                                 <flux:select
                                                     name="edit_item_unit"
                                                     label="Unidade"
-                                                    :value="old('editing_item_id') == $item->id ? old('edit_item_unit') : $item->unit"
+                                                    :value="old('editing_item_id') == $item->id ? old('edit_item_unit') : $item->unit->value"
                                                     required
                                                 >
                                                     <flux:select.option value="un">Unidade</flux:select.option>

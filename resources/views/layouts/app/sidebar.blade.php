@@ -64,9 +64,6 @@
                     <flux:sidebar.item icon="clipboard-document-list" :href="route('shopping-lists.index')" :current="request()->routeIs('shopping-lists.*')" wire:navigate>
                         {{ __('Listas de compras') }}
                     </flux:sidebar.item>
-                    <flux:sidebar.item icon="shopping-cart" :href="route('purchases.index')" :current="request()->routeIs('purchases.*')" wire:navigate>
-                        {{ __('Compras') }}
-                    </flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

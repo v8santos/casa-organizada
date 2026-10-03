@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\HouseholdController;
-use App\Http\Controllers\Web\PurchaseController;
 use App\Http\Controllers\Web\ShoppingListController;
 use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
@@ -33,18 +32,6 @@ Route::middleware(['auth', 'verified', 'require-household'])->group(function () 
             Route::patch('{listId}/items/{itemId}', 'updateItem')->name('items.update');
             Route::delete('{listId}/items/{itemId}', 'destroyItem')->name('items.destroy');
             Route::put('update', 'update')->name('update');
-        });
-    });
-
-    Route::controller(PurchaseController::class)->group(function () {
-        Route::prefix('purchases')->name('purchases.')->group(function () {
-            Route::get('', 'indexPage')->name('index');
-            Route::get('edit/{purchaseId}', 'editPage')->name('edit');
-
-            Route::post('store', 'store')->name('store');
-            Route::post('{purchase}/items/store', 'storeItem')->name('items.store');
-            Route::put('{purchase}/shopping-list/{shoppingList}/items', 'syncItems')->name('shopping-list.items');
-            Route::delete('{purchase}/items/{itemId}', 'destroyItem')->name('items.destroy');
         });
     });
 
