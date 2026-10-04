@@ -156,18 +156,17 @@
                         </div>
                     @else
                         <div class="border-t border-zinc-200 dark:border-zinc-700">
-                            <div class="hidden grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_6rem_12rem] gap-4 border-b border-zinc-100 px-6 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 md:grid">
+                            <div class="hidden grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_12rem] gap-4 border-b border-zinc-100 px-6 py-3 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:border-zinc-800 md:grid">
                                 <span>Produto</span>
                                 <span>Quantidade</span>
                                 <span>Preço unitário</span>
                                 <span class="text-right">Subtotal</span>
-                                <span class="text-right">Quantidade comprada</span>
                                 <span class="sr-only">Ações</span>
                             </div>
 
                             <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
                                 @foreach ($list->items as $item)
-                                    <li class="grid grid-cols-[minmax(0,1fr)_auto] gap-2 px-6 py-4 text-sm md:grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_6rem_12rem] md:items-center md:gap-4">
+                                    <li class="{{ $item->status->purchased() ? 'bg-zinc-700' : '' }} grid grid-cols-[minmax(0,1fr)_auto] gap-2 px-6 py-4 text-sm md:grid-cols-[minmax(0,1fr)_6rem_7rem_8rem_12rem] md:items-center md:gap-4">
                                         <div class="flex min-w-0 items-center gap-3">
                                             <span class="truncate font-medium text-zinc-900 dark:text-white">{{ $item->name }}</span>
                                         </div>
@@ -180,11 +179,19 @@
                                         </span>
 
                                         <div class="col-start-2 row-start-1 row-end-5 flex items-start justify-end gap-1 md:col-start-auto md:row-auto md:items-center">
-                                            <flux:modal.trigger name="buy-item-{{ $item->id }}">
-                                                <flux:button variant="primary" size="sm" icon="shopping-cart" aria-label="Comprar {{ $item->name }}">
-                                                    Comprar
-                                                </flux:button>
-                                            </flux:modal.trigger>
+                                            @if (! $item->status->purchased())
+                                                <flux:modal.trigger name="buy-item-{{ $item->id }}">
+                                                    <flux:button variant="primary" size="sm" icon="shopping-cart" aria-label="Comprar {{ $item->name }}">
+                                                        Comprar
+                                                    </flux:button>
+                                                </flux:modal.trigger>
+                                            @else
+                                                <flux:modal.trigger name="return-item-{{ $item->id }}">
+                                                    <flux:button variant="danger" size="sm" icon="arrow-uturn-left" aria-label="Devolver {{ $item->name }}">
+                                                        Devolver
+                                                    </flux:button>
+                                                </flux:modal.trigger>
+                                            @endif
 
                                             <flux:modal.trigger name="edit-item-{{ $item->id }}">
                                                 <flux:button variant="ghost" size="sm" icon="pencil-square" aria-label="Editar {{ $item->name }}" />
@@ -197,41 +204,45 @@
                                     </li>
 
                                     <flux:modal name="buy-item-{{ $item->id }}" focusable class="max-w-md">
-                                        <form method="POST" action="{{ route('shopping-lists.items.update', ['listId' => $list->id, 'itemId' => $item->id]) }}" class="space-y-6">
+                                        <form method="POST" action="{{ route('shopping-lists.items.buy', ['listId' => $list->id, 'itemId' => $item->id]) }}" class="space-y-3 mt-6">
                                             @csrf
 
-                                            <div class="flex items-start gap-4">
+                                            <div class="flex items-center gap-4">
                                                 <div class="grid size-10 shrink-0 place-items-center rounded-full bg-red-100 text-green-600 dark:bg-green-950 dark:text-green-400">
                                                     <flux:icon.shopping-cart class="size-5" />
                                                 </div>
                                                 <div>
-                                                    <flux:heading size="lg">Comprar item?</flux:heading>
-                                                    <flux:subheading class="mt-2">
-                                                        O item <strong class="font-medium text-zinc-900 dark:text-white">{{ $item->name }}</strong> será adicionado às compras
-                                                    </flux:subheading>
+                                                    <flux:heading size="lg">Confirme a compra do item!</flux:heading>
                                                 </div>
                                             </div>
-
-                                            <flux:input
-                                                name="buy_item_price"
-                                                label="Preço"
-                                                :value="$item->estimated_price"
-                                                required
-                                                autofocus
-                                            />
-
-                                            <flux:input
-                                                name="buy_item_quantity"
-                                                label="Quantidade ({{  $item->unit->label() }})"
-                                                :value="$item->quantity"
-                                                required
-                                            />
 
                                             <div class="flex justify-end gap-3 border-t border-zinc-100 pt-5 dark:border-zinc-800">
                                                 <flux:modal.close>
                                                     <flux:button variant="ghost">Cancelar</flux:button>
                                                 </flux:modal.close>
-                                                <flux:button type="submit" variant="primary">Adicionar item</flux:button>
+                                                <flux:button type="submit" variant="primary">Confirmar</flux:button>
+                                            </div>
+                                        </form>
+                                    </flux:modal>
+
+                                    <flux:modal name="return-item-{{ $item->id }}" focusable class="max-w-md">
+                                        <form method="POST" action="{{ route('shopping-lists.items.return', ['listId' => $list->id, 'itemId' => $item->id]) }}" class="space-y-3 mt-6">
+                                            @csrf
+
+                                            <div class="flex items-center gap-4">
+                                                <div class="grid size-10 shrink-0 place-items-center rounded-full bg-red-100 text-green-600 dark:bg-green-950 dark:text-green-400">
+                                                    <flux:icon.arrow-uturn-left class="size-5" />
+                                                </div>
+                                                <div>
+                                                    <flux:heading size="lg">Confirme a devolução do item!</flux:heading>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex justify-end gap-3 border-t border-zinc-100 pt-5 dark:border-zinc-800">
+                                                <flux:modal.close>
+                                                    <flux:button variant="ghost">Cancelar</flux:button>
+                                                </flux:modal.close>
+                                                <flux:button type="submit" variant="primary">Confirmar</flux:button>
                                             </div>
                                         </form>
                                     </flux:modal>

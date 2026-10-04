@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified', 'require-household'])->group(function () 
             Route::post('store', 'store')->name('store');
             Route::post('{listId}/items', 'storeItem')->name('items.store');
             Route::patch('{listId}/items/{itemId}', 'updateItem')->name('items.update');
+            Route::post('{listId}/items/{itemId}/buy', 'buy')->name('items.buy');
+            Route::post('{listId}/items/{itemId}/return', 'return')->name('items.return');
             Route::delete('{listId}/items/{itemId}', 'destroyItem')->name('items.destroy');
             Route::put('update', 'update')->name('update');
         });

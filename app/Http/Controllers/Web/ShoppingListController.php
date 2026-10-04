@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Concerns\HasHousehold;
+use App\Enums\ItemStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Models\ShoppingList;
 use App\Services\ShoppingList\ShoppingListService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -127,6 +129,48 @@ class ShoppingListController extends Controller
         return redirect()
             ->route('shopping-lists.edit', $list)
             ->with('status', 'Item atualizado com sucesso.');
+    }
+
+    public function buy(Request $request, int $listId, int $itemId): RedirectResponse
+    {
+        $list = ShoppingList::findOrFail($listId);
+
+        $purchased = $list->items()
+            ->where('id', $itemId)
+            ->update([
+                'status' => ItemStatusEnum::PURCHASED,
+            ]);
+
+        if (! $purchased) {
+            return redirect()
+                ->route('shopping-lists.edit', $list)
+                ->with('error', 'Falha ao comprar item!');
+        }
+
+        return redirect()
+            ->route('shopping-lists.edit', $list)
+            ->with('status', 'Item comprado com sucesso.');
+    }
+
+    public function return(Request $request, int $listId, int $itemId): RedirectResponse
+    {
+        $list = ShoppingList::findOrFail($listId);
+
+        $purchased = $list->items()
+            ->where('id', $itemId)
+            ->update([
+                'status' => ItemStatusEnum::PENDING,
+            ]);
+
+        if (! $purchased) {
+            return redirect()
+                ->route('shopping-lists.edit', $list)
+                ->with('error', 'Falha ao devolver item!');
+        }
+
+        return redirect()
+            ->route('shopping-lists.edit', $list)
+            ->with('status', 'Item devolvido com sucesso.');
     }
 
     public function shareWhatsApp(Request $request, int $listId): RedirectResponse

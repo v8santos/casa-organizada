@@ -20,4 +20,9 @@ enum ItemStatusEnum: int
             self::CANCELLED => 'Cancelado',
         };
     }
+
+    public function purchased(): bool
+    {
+        return $this === self::PURCHASED;
+    }
 }

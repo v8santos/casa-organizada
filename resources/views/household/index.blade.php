@@ -16,5 +16,12 @@
                 Acessar
             </flux:button>
         </form>
+        <flux:button
+            variant="primary"
+            class="cursor-pointer mt-4"
+            :href="route('households.create')"
+        >
+            Adicionar grupo
+        </flux:button>
     </article>
 </x-layouts::app>
