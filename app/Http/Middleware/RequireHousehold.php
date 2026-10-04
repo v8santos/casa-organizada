@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
 class RequireHousehold
@@ -22,10 +23,16 @@ class RequireHousehold
         if (! $householdId) {
             return redirect()->route('households.index');
         }
-
+        
         $household = $user
             ->households()
-            ->findOrFail($householdId);
+            ->find($householdId);
+
+        if (! $household) {
+            Cookie::forget('household_id');
+
+            return redirect()->route('households.index');
+        }
 
         $request->attributes->set(
             'current_household',
