@@ -53,6 +53,18 @@ class ShoppingListController extends Controller
             ->with('status', 'Lista criada com sucesso.');
     }
 
+    public function toggleStatus(int $listId): RedirectResponse
+    {
+        $list = ShoppingList::findOrFail($listId);
+        $list->update([
+            'purchased_at' => $list->purchased_at ? null : now(),
+        ]);
+
+        return redirect()
+            ->route('shopping-lists.edit', $list)
+            ->with('status', 'Status da lista alterado.');
+    }
+
     public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([

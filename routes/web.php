@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified', 'require-household'])->group(function () 
 
             Route::get('find/{listId}', 'find')->name('find');
             Route::post('store', 'store')->name('store');
+            Route::patch('{listId}/toggle-status', 'toggleStatus')->name('toggle-status');
             Route::post('{listId}/items', 'storeItem')->name('items.store');
             Route::patch('{listId}/items/{itemId}', 'updateItem')->name('items.update');
             Route::post('{listId}/items/{itemId}/buy', 'buy')->name('items.buy');

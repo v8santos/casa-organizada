@@ -12,7 +12,15 @@ class ShoppingList extends Model
         'name',
         'household_id',
         'owner_id',
+        'purchased_at'
     ];
+
+    public function casts(): array
+    {
+        return [
+            'purchased_at' => 'datetime'
+        ];
+    }
 
     public function items(): HasMany
     {

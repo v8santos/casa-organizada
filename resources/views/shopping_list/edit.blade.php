@@ -27,6 +27,7 @@
                 this.copied = true
                 setTimeout(() => this.copied = false, 2000)
             },
+            finished: @js((bool) $list->purchased_at),
         }"
     >
         <div>
@@ -37,7 +38,12 @@
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-                <flux:heading size="xl" level="1">{{ $list->name ?: 'Lista sem título' }}</flux:heading>
+                <div class="flex gap-2">
+                    <flux:heading size="xl" level="1">{{ $list->name ?: 'Lista sem título' }}</flux:heading>
+                    @if($list->purchased_at)
+                        <small>Comprado em: {{ $list->purchased_at->format('d-m-y H:i:s') }}</small>
+                    @endif
+                </div>
                 <flux:subheading class="mt-1">Edite os dados e adicione os produtos da sua compra.</flux:subheading>
             </div>
 
@@ -68,6 +74,20 @@
                     <span x-show="!copied">Copiar lista</span>
                     <span x-show="copied" x-cloak>Copiada!</span>
                 </flux:button>
+
+                <form action="{{ route('shopping-lists.toggle-status', $list) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+
+                    <flux:button
+                        size="sm"
+                        variant="filled"
+                        type="submit"
+                    >
+                        <span x-show="!finished">Finalizar compra</span>
+                        <span x-show="finished">Retomar compra</span>
+                    </flux:button>
+                </form>
             </div>
         </div>
 
