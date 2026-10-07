@@ -2,6 +2,7 @@
 
 namespace App\Services\ShoppingList;
 
+use App\Enums\ItemStatusEnum;
 use App\Models\ShoppingList;
 use App\Models\ShoppingListItem;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,6 +23,9 @@ final class ShoppingListService
     {
         return ShoppingList::query()
             ->with(['items' => fn ($query) => $query->orderBy('status')])
+            ->withCount(['items', 'items as purchased_items_count' => function($query) {
+                $query->where('status', ItemStatusEnum::PURCHASED);
+            }])
             ->where('household_id', $householdId)
             ->find($id);
     }

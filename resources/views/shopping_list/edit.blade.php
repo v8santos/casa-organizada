@@ -3,6 +3,9 @@
         $estimatedTotal = $list->items->sum(
             fn ($item) => round((float) $item->estimated_price * $item->quantity, 2)
         );
+        $purchasedItemsTotal = $list->items->where('status', 2)->sum(
+            fn ($item) => round((float) $item->estimated_price * $item->quantity, 2)
+        );
     @endphp
 
     <div
@@ -89,6 +92,27 @@
                     </flux:button>
                 </form>
             </div>
+        </div>
+
+        <flux:separator variant="subtle" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <section class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 p-6">
+                <flux:heading>Quantidade de itens</flux:heading>
+                <div class="font-bold text-2xl">{{ $list->items_count }}</div>
+            </section>
+            <section class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 p-6">
+                <flux:heading>Valor estimado</flux:heading>
+                <div class="font-bold text-2xl">R$ {{ number_format($estimatedTotal, 2, ',', '.') }}</div>
+            </section>
+            <section class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 p-6">
+                <flux:heading>Quantidade comprada</flux:heading>
+                <div class="font-bold text-2xl">{{ $list->purchased_items_count }}</div>
+            </section>
+            <section class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900 p-6">
+                <flux:heading>Valor comprado</flux:heading>
+                <div class="font-bold text-2xl">R$ {{ number_format($purchasedItemsTotal, 2, ',', '.') }}</div>
+            </section>
         </div>
 
         <flux:separator variant="subtle" />
