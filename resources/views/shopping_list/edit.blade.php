@@ -41,8 +41,8 @@
 
         <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-                <div class="flex gap-2">
-                    <flux:heading size="xl" level="1">{{ $list->name ?: 'Lista sem título' }}</flux:heading>
+                <div class="flex gap-4">
+                    <livewire:update-shopping-list-title-form :shoppingList="$list"/>
                     @if($list->purchased_at)
                         <small>Comprado em: {{ $list->purchased_at->format('d-m-y H:i:s') }}</small>
                     @endif
@@ -402,24 +402,6 @@
                     @endif
                 </section>
             </div>
-
-            <aside class="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-                <div class="border-b border-zinc-200 px-6 py-5 dark:border-zinc-700">
-                    <flux:heading size="lg">Detalhes da lista</flux:heading>
-                    <flux:text class="mt-1 text-sm">Informações gerais da compra.</flux:text>
-                </div>
-
-                <form method="POST" action="{{ route('shopping-lists.update') }}" class="space-y-5 p-6">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="list_id" value="{{ $list->id }}">
-                    <flux:input name="name" label="Nome da lista" :value="old('name', $list->name)" required />
-
-                    <div class="flex justify-end border-t border-zinc-100 pt-5 dark:border-zinc-800">
-                        <flux:button type="submit" variant="primary">Salvar alterações</flux:button>
-                    </div>
-                </form>
-            </aside>
         </div>
     </div>
 </x-layouts::app>
