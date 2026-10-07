@@ -108,63 +108,65 @@
                         <flux:text class="mt-1 text-sm">Adicione os produtos que pretende comprar.</flux:text>
                     </div>
 
-                    <form method="POST" action="{{ route('shopping-lists.items.store', ['listId' => $list]) }}" class="p-6">
-                        @csrf
+                    @if (! $list->purchased_at)
+                        <form method="POST" action="{{ route('shopping-lists.items.store', ['listId' => $list]) }}" class="p-6">
+                            @csrf
 
-                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12">
-                            <div class="sm:col-span-2 lg:col-span-5">
-                                <flux:input
-                                    name="item_name"
-                                    label="Item"
-                                    :value="old('item_name')"
-                                    placeholder="Ex.: Arroz"
-                                    required
-                                    autofocus
-                                />
+                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12">
+                                <div class="sm:col-span-2 lg:col-span-5">
+                                    <flux:input
+                                        name="item_name"
+                                        label="Item"
+                                        :value="old('item_name')"
+                                        placeholder="Ex.: Arroz"
+                                        required
+                                        autofocus
+                                    />
+                                </div>
+
+                                <div class="lg:col-span-2">
+                                    <flux:input
+                                        name="item_quantity"
+                                        type="text"
+                                        inputmode="decimal"
+                                        label="Quantidade"
+                                        :value="old('item_quantity', 1)"
+                                        placeholder="Ex.: 0,5"
+                                        required
+                                    />
+                                </div>
+
+                                <div class="lg:col-span-2">
+                                    <flux:select name="item_unit" label="Unidade" :value="old('item_unit', 'un')" required>
+                                        <flux:select.option value="un">Unidade</flux:select.option>
+                                        <flux:select.option value="kg">Quilograma</flux:select.option>
+                                        <flux:select.option value="g">Grama</flux:select.option>
+                                        <flux:select.option value="l">Litro</flux:select.option>
+                                        <flux:select.option value="ml">Mililitro</flux:select.option>
+                                        <flux:select.option value="pct">Pacote</flux:select.option>
+                                        <flux:select.option value="cx">Caixa</flux:select.option>
+                                    </flux:select>
+                                </div>
+
+                                <div class="lg:col-span-3">
+                                    <flux:input
+                                        name="item_estimated_price"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        label="Preço unitário"
+                                        :value="old('item_estimated_price')"
+                                        placeholder="0,00"
+                                        icon="currency-dollar"
+                                    />
+                                </div>
                             </div>
 
-                            <div class="lg:col-span-2">
-                                <flux:input
-                                    name="item_quantity"
-                                    type="text"
-                                    inputmode="decimal"
-                                    label="Quantidade"
-                                    :value="old('item_quantity', 1)"
-                                    placeholder="Ex.: 0,5"
-                                    required
-                                />
+                            <div class="mt-6 flex justify-end border-t border-zinc-100 pt-5 dark:border-zinc-800">
+                                <flux:button type="submit" variant="primary" icon="plus">Adicionar item</flux:button>
                             </div>
-
-                            <div class="lg:col-span-2">
-                                <flux:select name="item_unit" label="Unidade" :value="old('item_unit', 'un')" required>
-                                    <flux:select.option value="un">Unidade</flux:select.option>
-                                    <flux:select.option value="kg">Quilograma</flux:select.option>
-                                    <flux:select.option value="g">Grama</flux:select.option>
-                                    <flux:select.option value="l">Litro</flux:select.option>
-                                    <flux:select.option value="ml">Mililitro</flux:select.option>
-                                    <flux:select.option value="pct">Pacote</flux:select.option>
-                                    <flux:select.option value="cx">Caixa</flux:select.option>
-                                </flux:select>
-                            </div>
-
-                            <div class="lg:col-span-3">
-                                <flux:input
-                                    name="item_estimated_price"
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    label="Preço unitário"
-                                    :value="old('item_estimated_price')"
-                                    placeholder="0,00"
-                                    icon="currency-dollar"
-                                />
-                            </div>
-                        </div>
-
-                        <div class="mt-6 flex justify-end border-t border-zinc-100 pt-5 dark:border-zinc-800">
-                            <flux:button type="submit" variant="primary" icon="plus">Adicionar item</flux:button>
-                        </div>
-                    </form>
+                        </form>
+                    @endif
 
                     @if ($list->items->isEmpty())
                         <div class="border-t border-zinc-200 px-6 py-12 text-center dark:border-zinc-700">
@@ -199,27 +201,29 @@
                                         </span>
 
                                         <div class="col-start-2 row-start-1 row-end-5 flex items-start justify-end gap-1 md:col-start-auto md:row-auto md:items-center">
-                                            @if (! $item->status->purchased())
-                                                <flux:modal.trigger name="buy-item-{{ $item->id }}">
-                                                    <flux:button variant="primary" size="sm" icon="shopping-cart" aria-label="Comprar {{ $item->name }}">
-                                                        Comprar
-                                                    </flux:button>
-                                                </flux:modal.trigger>
-                                            @else
-                                                <flux:modal.trigger name="return-item-{{ $item->id }}">
-                                                    <flux:button variant="danger" size="sm" icon="arrow-uturn-left" aria-label="Devolver {{ $item->name }}">
-                                                        Devolver
-                                                    </flux:button>
-                                                </flux:modal.trigger>
-                                            @endif
+                                            @if (! $list->purchased_at)
+                                                @if (! $item->status->purchased())
+                                                    <flux:modal.trigger name="buy-item-{{ $item->id }}">
+                                                        <flux:button variant="primary" size="sm" icon="shopping-cart" aria-label="Comprar {{ $item->name }}">
+                                                            Comprar
+                                                        </flux:button>
+                                                    </flux:modal.trigger>
+                                                @else
+                                                    <flux:modal.trigger name="return-item-{{ $item->id }}">
+                                                        <flux:button variant="danger" size="sm" icon="arrow-uturn-left" aria-label="Devolver {{ $item->name }}">
+                                                            Devolver
+                                                        </flux:button>
+                                                    </flux:modal.trigger>
+                                                @endif
 
-                                            <flux:modal.trigger name="edit-item-{{ $item->id }}">
-                                                <flux:button variant="ghost" size="sm" icon="pencil-square" aria-label="Editar {{ $item->name }}" />
-                                            </flux:modal.trigger>
+                                                <flux:modal.trigger name="edit-item-{{ $item->id }}">
+                                                    <flux:button variant="ghost" size="sm" icon="pencil-square" aria-label="Editar {{ $item->name }}" />
+                                                </flux:modal.trigger>
 
-                                            <flux:modal.trigger name="delete-item-{{ $item->id }}">
-                                                <flux:button variant="ghost" size="sm" icon="trash" class="text-red-600! hover:bg-red-50! hover:text-red-700! dark:text-red-400! dark:hover:bg-red-950/50!" aria-label="Excluir {{ $item->name }}" />
-                                            </flux:modal.trigger>
+                                                <flux:modal.trigger name="delete-item-{{ $item->id }}">
+                                                    <flux:button variant="ghost" size="sm" icon="trash" class="text-red-600! hover:bg-red-50! hover:text-red-700! dark:text-red-400! dark:hover:bg-red-950/50!" aria-label="Excluir {{ $item->name }}" />
+                                                </flux:modal.trigger>
+                                                @endif
                                         </div>
                                     </li>
 

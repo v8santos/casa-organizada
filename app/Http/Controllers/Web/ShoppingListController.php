@@ -68,6 +68,7 @@ class ShoppingListController extends Controller
     public function update(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            // TODO: [fix] Isso aqui deveria vir nos params de rota
             'list_id' => ['required', 'integer'],
             'name' => ['required', 'string', 'max:255'],
         ]);
@@ -85,7 +86,7 @@ class ShoppingListController extends Controller
     public function storeItem(Request $request, int $listId): RedirectResponse
     {
         $list = $this->service->getShoppingListById($listId, $request->household()->id);
-        abort_if($list === null, 404);
+        abort_if($list === null || $list->purchased_at, 404);
 
         $request->merge([
             'item_quantity' => str_replace(',', '.', (string) $request->input('item_quantity')),

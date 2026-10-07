@@ -21,6 +21,7 @@ final class ShoppingListService
     public function getShoppingListById(int $id, int $householdId): ?ShoppingList
     {
         return ShoppingList::query()
+            ->with(['items' => fn ($query) => $query->orderBy('status')])
             ->where('household_id', $householdId)
             ->find($id);
     }
