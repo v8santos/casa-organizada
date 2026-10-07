@@ -1,27 +1,20 @@
 <x-layouts::app title="Criar grupo familiar">
-    <article class="flex">
-        <form action="{{ route('households.set') }}" method="POST">
-            @csrf
-            <flux:radio.group name="household_id" label="Escolha com qual grupo familiar deseja acessar a plataforma">
-                @foreach ($households as $household)
-                    <flux:radio :value="$household->id" :label="$household->name" />
-                @endforeach
-            </flux:radio-group>
-
+    <div class="flex h-full w-full flex-1 flex-col gap-6">
+        <div class="flex justify-between">
+            <div>
+                <flux:heading size="xl" level="1">Grupo familiar</flux:heading>
+                <flux:subheading class="mt-1">Gerencie e acesse seus grupos.</flux:subheading>
+            </div>
             <flux:button
                 variant="primary"
                 class="cursor-pointer mt-4"
-                type="submit"
+                :href="route('households.create')"
             >
-                Acessar
+                Adicionar grupo
             </flux:button>
-        </form>
-        <flux:button
-            variant="primary"
-            class="cursor-pointer mt-4"
-            :href="route('households.create')"
-        >
-            Adicionar grupo
-        </flux:button>
-    </article>
+        </div>
+        <article>
+            <livewire:select-household :households="$households"/>
+        </article>
+    </div>
 </x-layouts::app>
