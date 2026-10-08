@@ -10,8 +10,8 @@ Route::middleware(['auth', 'verified', 'require-household'])->group(function () 
     Route::get('', fn () => redirect()->route('dashboard'))->name('home');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::controller(HouseholdController::class)->withoutMiddleware('require-household')->group(function () {
-        Route::prefix('households')->name('households.')->group(function () {
+    Route::controller(HouseholdController::class)->group(function () {
+        Route::prefix('households')->name('households.')->withoutMiddleware('require-household')->group(function () {
             Route::get('', [HouseholdController::class, 'index'])->name('index');
             Route::get('create', fn () => view('household.create'))->name('create');
             Route::post('store', 'store')->name('store');

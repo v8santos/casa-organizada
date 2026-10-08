@@ -15,7 +15,7 @@ class ShoppingList extends Model
         'purchased_at'
     ];
 
-    public function casts(): array
+    protected function casts(): array
     {
         return [
             'purchased_at' => 'datetime'
